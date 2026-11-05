@@ -2,6 +2,8 @@
 
 一款基于 Kotlin Multiplatform + Compose Multiplatform 开发的 Android ADB 工具箱，采用液态玻璃（Liquid Glass）UI 设计。
 
+> **当前版本：v3.0**（版本定义位置：`androidApp/build.gradle.kts` → `versionName = "3.0"` / `versionCode = 30`；仓库名 `ADBToolboxGlass-v3.0` 与之一致，GitHub 远端仓库名 `ADBToolboxGlassv2.7` 为历史遗留命名，未同步）。下方「v2.9 新增」及其后章节为 v3.0 之前的历史版本记录。
+
 ## 功能特性
 
 ### 核心功能
