@@ -29,7 +29,7 @@
 - 【发布声明】 [发布声明.md](发布声明.md) —— 许可（AGPL / GhostLock 组件）、免责、安全合规、发布者确认清单
 
 ## 安装
-在 **Releases** 页下载 `ADBToolboxGlass-v3.1-稳定版-release.apk` 安装（正式签名）。
+在 **Releases** 页下载 `ADBToolboxGlass-v3.1-release.apk` 安装（正式签名）。
 
 ## 构建
 需要 JDK 17、Android SDK（compileSdk 37）：
