@@ -256,19 +256,22 @@ fun AppDetailScreen(
 
         // 读取失败/应用不存在时给出明确提示，避免出现空白页面
         if (loadFinished && appInfo == null) {
-            GlassCard(backdrop = backdrop, pageType = "apps") {
+            StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "apps") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     BasicText(packageName.ifEmpty { AppStrings.get("unknown") }, style = TextStyle(contentColor, AppLayout.bodySize))
                     Spacer(Modifier.height(6f.dp))
                     BasicText(AppStrings.get("operation_failed"), style = TextStyle(Color(0xFFFF3B30), 12f.sp))
                 }
             }
+    }
             Spacer(Modifier.height(AppLayout.sectionGap))
         }
 
         // 应用信息卡片
         appInfo?.let { app ->
-            GlassCard(backdrop = backdrop, pageType = "apps") {
+            StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "apps") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         // 真实应用图标，取不到时内部回退首字母占位
@@ -293,13 +296,15 @@ fun AppDetailScreen(
                     InfoRow(AppStrings.get("status"), if (app.isFrozen) AppStrings.get("frozen") else AppStrings.get("normal"), contentColor)
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 权限不可用提示 + 一键请求 Shizuku
         if (privileged == false) {
-            GlassCard(backdrop = backdrop, pageType = "apps") {
+            StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "apps") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     BasicText(
                         "${AppStrings.get("need_root_or_shizuku")} · ${AppStrings.get("authorization_required")}",
@@ -329,11 +334,13 @@ fun AppDetailScreen(
                     }
                 }
             }
+    }
             Spacer(Modifier.height(AppLayout.sectionGap))
         }
 
         // 操作按钮
-        GlassCard(backdrop = backdrop, pageType = "apps") {
+        StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "apps") {
             Column(Modifier.padding(20f.dp)) {
                 SectionTitle(AppStrings.get("app_actions"), contentColor)
                 Row(horizontalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -401,11 +408,13 @@ fun AppDetailScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 权限列表（点击一次切换授权状态；撤销需二次确认）
-        GlassCard(backdrop = backdrop, pageType = "apps") {
+        StaggeredCard(4) {
+    GlassCard(backdrop = backdrop, pageType = "apps") {
             Column(Modifier.padding(20f.dp)) {
                 SectionTitle("${AppStrings.get("permissions")} (${permissions.size})", contentColor)
                 permissions.take(30).forEach { perm ->
@@ -455,12 +464,14 @@ fun AppDetailScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 操作结果
         if (actionResult.isNotEmpty()) {
-            GlassCard(backdrop = backdrop, pageType = "apps") {
+            StaggeredCard(5) {
+    GlassCard(backdrop = backdrop, pageType = "apps") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     BasicText(
                         actionResult,
@@ -468,6 +479,7 @@ fun AppDetailScreen(
                     )
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(80f.dp))

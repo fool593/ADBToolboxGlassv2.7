@@ -50,13 +50,6 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun MainContent() {
-    val isLightTheme = !AppSettings.isDarkMode
-    // 字体颜色：优先使用用户设置的玻璃字体色（必须非透明），否则跟随主题
-    val fontColorSetting = GlassEffectConfig.fontColor.value
-    val contentColor = if (fontColorSetting != Color.Unspecified && fontColorSetting.alpha > 0f) fontColorSetting
-        else if (isLightTheme) Color.Black else Color.White
-
-    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     // 首次启动先进设置向导（欢迎 → 主题 → 权限 → 完成）；完成或跳过后落盘，之后直接进首页。
     var currentDestination by rememberSaveable {
         mutableStateOf(
@@ -64,6 +57,66 @@ fun MainContent() {
             else ADBDestination.Onboarding
         )
     }
+
+    // v3.2 ColorOS 17 开启动画独立 UI（第 5 套独立 UI）：
+    // 两种进入方式 —— 设置页「界面风格」切到 coloros17（全局风格），或首页入口预览（临时目的地）。
+    // 全屏覆盖，不进玻璃渲染路径；退出/跳转时若为全局风格则切回玻璃并落盘。
+    val colorOS17Active =
+        com.example.adbtoolbox.common.AppSettings.uiStyle == "coloros17" ||
+            currentDestination == ADBDestination.ColorOS17
+    if (colorOS17Active) {
+        val exitColorOS17: () -> Unit = {
+            if (com.example.adbtoolbox.common.AppSettings.uiStyle == "coloros17") {
+                com.example.adbtoolbox.common.AppSettings.uiStyle = "glass"
+                com.example.adbtoolbox.common.GlassEffectConfig.applyUiStyle()
+                try { com.example.adbtoolbox.common.GlassEffectPersistence.saveAll() } catch (_: Exception) {}
+            }
+            currentDestination = ADBDestination.Home
+        }
+        com.example.adbtoolbox.common.ui.coloros17.ColorOS17Root(
+            onExit = exitColorOS17,
+            onLaunch = {
+                exitColorOS17()
+                currentDestination = ADBDestination.Home
+            },
+            onOpenDownloader = {
+                if (com.example.adbtoolbox.common.AppSettings.uiStyle == "coloros17") {
+                    com.example.adbtoolbox.common.AppSettings.uiStyle = "glass"
+                    com.example.adbtoolbox.common.GlassEffectConfig.applyUiStyle()
+                    try { com.example.adbtoolbox.common.GlassEffectPersistence.saveAll() } catch (_: Exception) {}
+                }
+                currentDestination = ADBDestination.Downloader
+            },
+            onOpenDeviceInfo = {
+                if (com.example.adbtoolbox.common.AppSettings.uiStyle == "coloros17") {
+                    com.example.adbtoolbox.common.AppSettings.uiStyle = "glass"
+                    com.example.adbtoolbox.common.GlassEffectConfig.applyUiStyle()
+                    try { com.example.adbtoolbox.common.GlassEffectPersistence.saveAll() } catch (_: Exception) {}
+                }
+                currentDestination = ADBDestination.DeviceInfo
+            }
+        )
+        return
+    }
+
+    // B 方案：独立原生 UI（科技风，第二 UI），与玻璃 UI 完全独立的一套界面，由设置页「界面风格」切换
+    if (com.example.adbtoolbox.common.AppSettings.nativeUi) {
+        com.example.adbtoolbox.common.ui.TechRoot(
+            onSwitchToGlass = {
+                com.example.adbtoolbox.common.AppSettings.nativeUi = false
+                com.example.adbtoolbox.common.GlassEffectConfig.applyUiStyle()
+                try { com.example.adbtoolbox.common.GlassEffectPersistence.saveAll() } catch (_: Exception) {}
+            }
+        )
+        return
+    }
+    val isLightTheme = !AppSettings.isDarkMode
+    // 字体颜色：优先使用用户设置的玻璃字体色（必须非透明），否则跟随主题
+    val fontColorSetting = GlassEffectConfig.fontColor.value
+    val contentColor = if (fontColorSetting != Color.Unspecified && fontColorSetting.alpha > 0f) fontColorSetting
+        else if (isLightTheme) Color.Black else Color.White
+
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var selectedAppPackage by remember { mutableStateOf<String?>(null) }
     var selectedPlugin by remember { mutableStateOf<com.example.adbtoolbox.common.PluginData?>(null) }
     // 机型分类优化：从"机型分类"页进入性能页时带上品牌过滤（null = 全机型）
@@ -324,6 +377,14 @@ fun MainContent() {
                                 onInstallModule = { AppCache.pickRootModuleFileTrigger.value++ },
                                 selectedFilePath = AppCache.selectedRootModulePath.value
                             )
+                            // v3.2 多线程下载器：直链分块高速下载，完成后自动保存到手机内部存储 Download 文件夹
+                            ADBDestination.Downloader -> com.example.adbtoolbox.common.ui.DownloaderScreen(
+                                backdrop = backdrop,
+                                contentColor = contentColor,
+                                onBack = { currentDestination = ADBDestination.Home }
+                            )
+                            // v3.2 ColorOS 17 开启动画：顶部 colorOS17Active 已全屏接管，这里永不抵达（占位保证 when 穷尽）
+                            ADBDestination.ColorOS17 -> Unit
                         }
                     }
                 }

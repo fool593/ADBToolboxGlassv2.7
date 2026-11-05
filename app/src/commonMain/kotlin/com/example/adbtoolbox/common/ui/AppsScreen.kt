@@ -96,15 +96,17 @@ fun AppsScreen(
         BasicText(AppStrings.get("app_manager"), style = TextStyle(contentColor, AppLayout.titleSize, androidx.compose.ui.text.font.FontWeight.Bold))
         Spacer(Modifier.height(AppLayout.sectionGap))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            BasicText(AppStrings.get("show_system_apps"), style = TextStyle(contentColor, AppLayout.bodySize))
-            Spacer(Modifier.width(AppLayout.innerGap))
-            LiquidToggle(
-                selected = { showSystemApps },
-                onSelect = { showSystemApps = it },
-                backdrop = backdrop,
-                modifier = Modifier.size(51f.dp, 31f.dp)
-            )
+        StaggeredCard(0) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                BasicText(AppStrings.get("show_system_apps"), style = TextStyle(contentColor, AppLayout.bodySize))
+                Spacer(Modifier.width(AppLayout.innerGap))
+                LiquidToggle(
+                    selected = { showSystemApps },
+                    onSelect = { showSystemApps = it },
+                    backdrop = backdrop,
+                    modifier = Modifier.size(51f.dp, 31f.dp)
+                )
+            }
         }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
@@ -135,13 +137,15 @@ fun AppsScreen(
                 }
             }
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8f.dp)
-            ) {
-                items(apps, key = { it.packageName }) { app ->
-                    AppListItem(app = app, backdrop = backdrop, contentColor = contentColor, onClick = { onAppClick(app.packageName) })
+            StaggeredCard(1, Modifier.fillMaxSize()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8f.dp)
+                ) {
+                    items(apps, key = { it.packageName }) { app ->
+                        AppListItem(app = app, backdrop = backdrop, contentColor = contentColor, onClick = { onAppClick(app.packageName) })
+                    }
+                    item { Spacer(Modifier.height(80f.dp)) }
                 }
-                item { Spacer(Modifier.height(80f.dp)) }
             }
         }
     }

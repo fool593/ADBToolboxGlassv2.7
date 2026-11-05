@@ -19,6 +19,7 @@ class SplashActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.example.adbtoolbox.CrashGuard.install(applicationContext)
 
         val prefs = getSharedPreferences("splash_state", MODE_PRIVATE)
 
@@ -123,6 +124,7 @@ class SplashActivity : ComponentActivity() {
 
     private fun adjustVideoSize() {
         if (videoWidth == 0 || videoHeight == 0) return
+        try {
 
         val metrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(metrics)
@@ -147,6 +149,9 @@ class SplashActivity : ComponentActivity() {
         }
 
         videoView.layoutParams = layoutParams
+        } catch (e: Exception) {
+            // 个别 ROM 的 WindowManager 在开屏阶段异常，跳过尺寸适配不影响播放
+        }
     }
 
     private fun navigateToMain() {

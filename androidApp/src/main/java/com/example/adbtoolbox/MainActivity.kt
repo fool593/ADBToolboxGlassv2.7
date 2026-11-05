@@ -2,6 +2,7 @@ package com.example.adbtoolbox
 
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -32,6 +33,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        // 无障碍真实状态（权限无关的正解）：直接问系统启用了哪些无障碍服务，
+        // 而不是读 settings （无提权时 shell 读不到 secure 设置会误报未赋予）
+        try {
+            val am = getSystemService(android.view.accessibility.AccessibilityManager::class.java)
+            val enabled = am.getEnabledAccessibilityServiceList(
+                android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK or
+                    android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_GENERIC
+            ).any { s -> s.resolveInfo?.serviceInfo?.packageName == packageName }
+            com.example.adbtoolbox.common.AppCache.accessibilityServiceConnected.value = enabled
+        } catch (_: Exception) {
+        }
         // 开屏崩溃标记：能安全走到主界面 = 开屏没有崩，允许下次继续放开屏动画
         try {
             getSharedPreferences("splash_state", MODE_PRIVATE)
@@ -48,6 +60,37 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.example.adbtoolbox.CrashGuard.install(applicationContext)
+        // 上次运行若崩溃：用 Toast 显示堆栈开头，便于用户原样发回定位（不吞异常）
+        try {
+            val lastCrash = com.example.adbtoolbox.CrashGuard.lastCrash(this)
+            com.example.adbtoolbox.common.AppCache.crashLog.value = lastCrash
+            // 提示一次后清掉 crash.txt：避免每次启动都弹"上次运行崩溃"（崩溃证据仍在 Download 文件夹）
+            try {
+                java.io.File(filesDir, "crash.txt").delete()
+            } catch (_: Exception) {
+            }
+            lastCrash?.let { c ->
+                val head = c.take(1200)
+                android.widget.Toast.makeText(
+                    this,
+                    "[上次运行崩溃，请原样发回]\n" + head,
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+        } catch (_: Exception) {
+        }
+        // 上次若崩溃：本会话进入减负模式（玻璃强度/折射降档，降低原生渲染崩溃再触发概率）
+        try {
+            if (com.example.adbtoolbox.CrashGuard.lastCrash(this) != null) {
+                com.example.adbtoolbox.common.AppCache.reducedMode.value = true
+                val c = com.example.adbtoolbox.common.GlassEffectConfig
+                c.globalIntensity.value = (c.globalIntensity.value * 0.5f).coerceAtLeast(0.2f)
+                c.refractionAmount.value = (c.refractionAmount.value * 0.5f).coerceIn(0f, 0.1f)
+                c.blurRadius.value = (c.blurRadius.value * 0.5f).coerceAtLeast(2f)
+            }
+        } catch (_: Exception) {
+        }
         com.example.adbtoolbox.common.appContext = applicationContext
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -69,6 +112,24 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            // 多线程下载器：API 24-28 保存到公共 Download 目录需要 WRITE_EXTERNAL_STORAGE 运行时权限
+            val storagePermissionLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission()
+            ) { granted ->
+                if (!granted) {
+                    Toast.makeText(this, "需要存储权限才能保存到 Download 文件夹，请在设置中授予后重试", Toast.LENGTH_LONG).show()
+                }
+            }
+            val storageTrig by androidx.compose.runtime.rememberUpdatedState(AppCache.requestStoragePermissionTrigger.value)
+            LaunchedEffect(storageTrig) {
+                if (storageTrig > 0) {
+                    AppCache.requestStoragePermissionTrigger.value = 0 // 立即重置，防止重复弹框
+                    if (Build.VERSION.SDK_INT < 29) {
+                        storagePermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    }
+                }
+            }
+
             // 文件选择器：选择zip模块文件
             val filePicker = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()

@@ -17,6 +17,11 @@
          应用已开启 usesCleartextTraffic，本地 http 可以正常连。 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- 多线程下载器：API 24-28 直接写入公共 Download 目录需要存储权限（API 29+ 走 MediaStore 免权限，
+         系统对 targetSdk 29+ 的应用自动忽略此权限的运行时请求，声明无副作用） -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+
     <!-- Dhizuku 权限声明：让应用出现在 Dhizuku 的应用管理里 -->
     <uses-permission android:name="com.rosan.dhizuku.permission.API" />
 

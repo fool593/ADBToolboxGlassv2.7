@@ -152,23 +152,6 @@ object GlassEffectConfig {
         "紫" to Color(0xFFAF52DE).copy(alpha = 0.2f)
     )
 
-    // 保存参数
-    fun saveConfig(
-        corner: Float,
-        blur: Float,
-        refHeight: Float,
-        refAmount: Float,
-        chromatic: Float,
-        vibrancy: Boolean
-    ) {
-        cornerRadius.value = corner
-        blurRadius.value = blur
-        refractionHeight.value = refHeight
-        refractionAmount.value = refAmount
-        chromaticAberration.value = chromatic
-        enableVibrancy.value = vibrancy
-    }
-
     // 设置颜色
     fun setColor(color: Color) {
         glassColor.value = color
@@ -176,57 +159,16 @@ object GlassEffectConfig {
         AppSettings.markThemeUserOverride()
     }
 
-    // 设置字体颜色
-    fun setFontColor(color: Color) {
-        fontColor.value = color
-        AppSettings.markThemeUserOverride()
-    }
+    // 原生风格运行时覆盖标记：只影响渲染读值，绝不写入/覆盖用户玻璃参数（修复切回后卡片永久变平的 bug）
+    val nativeFlat = mutableStateOf(false)
 
-    // 保存全局效果参数
-    fun saveGlobalConfig(
-        intensity: Float,
-        navBlur: Float,
-        navOpac: Float,
-        navCorner: Float,
-        cardBlur: Float,
-        cardOpac: Float,
-        cardCorner: Float,
-        btnBlur: Float,
-        btnOpac: Float
-    ) {
-        globalIntensity.value = intensity
-        navBlurRadius.value = navBlur
-        navOpacity.value = navOpac
-        navCornerRadius.value = navCorner
-        cardBlurRadius.value = cardBlur
-        cardOpacity.value = cardOpac
-        cardCornerRadius.value = cardCorner
-        buttonBlurRadius.value = btnBlur
-        buttonOpacity.value = btnOpac
-    }
-
-    // 重置为默认值
-    fun resetToDefault() {
-        cornerRadius.value = 0.5f
-        blurRadius.value = 16f
-        refractionHeight.value = 0.2f
-        refractionAmount.value = 0.2f
-        chromaticAberration.value = 0f
-        enableVibrancy.value = true
-        globalIntensity.value = 1f
-        navBlurRadius.value = 8f
-        navOpacity.value = 0.4f
-        navCornerRadius.value = 0.6f
-        cardBlurRadius.value = 20f
-        cardOpacity.value = 0.3f
-        cardCornerRadius.value = 0.5f
-        buttonBlurRadius.value = 12f
-        buttonOpacity.value = 0.5f
-        glassColor.value = Color.White.copy(alpha = 0.15f)
-        fontColor.value = Color.Unspecified
-        longPressGlowIntensity.value = 0.6f
-        longPressGlowSize.value = 0.5f
-        longPressRefraction.value = 0.5f
-        longPressGlowColor.value = Color.White
+    /**
+     * UI 风格切换（非破坏性）：
+     * - tech：打开运行时扁平标记（科技 UI 自身全屏，玻璃参数原样保留，切回立即恢复）
+     * - coloros17：独立全屏引导 UI，不进玻璃渲染路径，nativeFlat 保持 false
+     * - glass：关闭扁平标记
+     */
+    fun applyUiStyle() {
+        nativeFlat.value = com.example.adbtoolbox.common.AppSettings.uiStyle == "tech"
     }
 }

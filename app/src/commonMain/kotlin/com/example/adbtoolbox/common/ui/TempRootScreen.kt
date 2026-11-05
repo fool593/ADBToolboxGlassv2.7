@@ -71,7 +71,8 @@ fun TempRootScreen(backdrop: Backdrop) {
         BasicText(AppStrings.get("temp_root_title"), style = TextStyle(Color.White, AppLayout.titleSize, FontWeight.Bold))
 
         // 处理器信息
-        GlassCard(backdrop = backdrop, pageType = "plugins") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
             Column(Modifier.padding(AppLayout.cardPad), verticalArrangement = Arrangement.spacedBy(AppLayout.innerGap)) {
                 BasicText(AppStrings.get("cpu_info"), style = TextStyle(Color.White, AppLayout.sectionTitleSize, FontWeight.Medium))
                 InfoRow(AppStrings.get("model"), cpuModel, Color.White)
@@ -90,9 +91,11 @@ fun TempRootScreen(backdrop: Backdrop) {
                 )
             }
         }
+    }
 
         // 选择提权包
-        GlassCard(backdrop = backdrop, pageType = "plugins") {
+        StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
             Column(Modifier.padding(AppLayout.cardPad), verticalArrangement = Arrangement.spacedBy(AppLayout.innerGap)) {
                 BasicText(AppStrings.get("temp_root_package"), style = TextStyle(Color.White, AppLayout.sectionTitleSize, FontWeight.Medium))
                 // 取到局部 val 再判空：委托属性（by remember）无法智能转换，用局部变量即可彻底去掉 !!
@@ -121,10 +124,12 @@ fun TempRootScreen(backdrop: Backdrop) {
                 }
             }
         }
+    }
 
         // 执行提权
         if (selectedFile != null) {
-            GlassCard(backdrop = backdrop, pageType = "plugins") {
+            StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                 Column(Modifier.padding(AppLayout.cardPad), verticalArrangement = Arrangement.spacedBy(AppLayout.innerGap)) {
                     BasicText(AppStrings.get("temp_root_flash"), style = TextStyle(Color.White, AppLayout.sectionTitleSize, FontWeight.Medium))
                     BasicText(
@@ -175,6 +180,7 @@ fun TempRootScreen(backdrop: Backdrop) {
                     }
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(80.dp))

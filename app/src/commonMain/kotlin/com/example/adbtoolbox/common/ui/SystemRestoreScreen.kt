@@ -113,7 +113,8 @@ fun SystemRestoreScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 安全检查表 ----------------
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(
                     AppStrings.get("restore_steps_title"),
@@ -196,6 +197,7 @@ fun SystemRestoreScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
@@ -220,7 +222,8 @@ fun SystemRestoreScreen(
         // 二次确认：把"将要执行什么"逐条列出来，避免误触
         if (confirmVisible) {
             Spacer(Modifier.height(AppLayout.sectionGap))
-            GlassCard(backdrop = backdrop, pageType = "home") {
+            StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     BasicText(
                         AppStrings.get("restore_confirm_title"),
@@ -283,12 +286,14 @@ fun SystemRestoreScreen(
                     }
                 }
             }
+    }
         }
 
         // ---------------- 结果（含真实回读） ----------------
         if (results.isNotEmpty() || overlayResults.isNotEmpty()) {
             Spacer(Modifier.height(AppLayout.sectionGap))
-            GlassCard(backdrop = backdrop, pageType = "home") {
+            StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     BasicText(
                         AppStrings.get("restore_result_title"),
@@ -339,12 +344,14 @@ fun SystemRestoreScreen(
                     )
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 现在受保护的组件（让用户知道不会再被"优化"掉） ----------------
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(
                     AppStrings.get("restore_protected_title"),
@@ -377,6 +384,7 @@ fun SystemRestoreScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(80.dp))
     }

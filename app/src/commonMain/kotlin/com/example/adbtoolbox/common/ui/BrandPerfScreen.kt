@@ -106,7 +106,8 @@ fun BrandPerfScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 本机识别 ----------------
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(
                     AppStrings.get("brand_perf_local_device"),
@@ -150,6 +151,7 @@ fun BrandPerfScreen(
                 }
             }
         }
+    }
 
         // ---------------- 每个机型一张独立分类卡 ----------------
         brandOrder.forEach { brandId ->
@@ -165,7 +167,8 @@ fun BrandPerfScreen(
             val isLocal = info != null && !isUniversal && info.brandId == brandId
 
             Spacer(Modifier.height(AppLayout.sectionGap))
-            GlassCard(backdrop = backdrop, pageType = "home") {
+            StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
@@ -249,6 +252,7 @@ fun BrandPerfScreen(
                     }
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(90.dp))

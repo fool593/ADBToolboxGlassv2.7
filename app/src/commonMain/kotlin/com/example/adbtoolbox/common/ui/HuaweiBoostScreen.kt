@@ -221,7 +221,8 @@ fun HuaweiBoostScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 设备卡 ----------------
-        GlassCard(backdrop = backdrop, pageType = "default") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "default") {
             Column(Modifier.padding(AppLayout.cardPadCompact)) {
                 BasicText(
                     AppStrings.get("hw_device_card"),
@@ -294,6 +295,7 @@ fun HuaweiBoostScreen(
                 }
             }
         }
+    }
 
         // ---------------- 非华为机型提示 ----------------
         val devForWarn = info
@@ -316,7 +318,8 @@ fun HuaweiBoostScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 操作区 ----------------
-        GlassCard(backdrop = backdrop, pageType = "default") {
+        StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "default") {
             Column(Modifier.padding(AppLayout.cardPadCompact)) {
                 BasicText(
                     AppStrings.get("hw_actions"),
@@ -413,11 +416,13 @@ fun HuaweiBoostScreen(
                 )
             }
         }
+    }
 
         // ---------------- 执行报告 ----------------
         if (report != null || rollbackLog != null || resultById.isNotEmpty()) {
             Spacer(Modifier.height(AppLayout.sectionGap))
-            GlassCard(backdrop = backdrop, pageType = "default") {
+            StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "default") {
                 Column(Modifier.padding(AppLayout.cardPadCompact)) {
                     BasicText(
                         AppStrings.get("hw_report_title"),
@@ -482,6 +487,7 @@ fun HuaweiBoostScreen(
                     }
                 }
             }
+    }
         }
 
         // ---------------- 方法列表 ----------------
@@ -489,7 +495,8 @@ fun HuaweiBoostScreen(
             val groupMethods = methods.filter { it.group == group.id }
             if (groupMethods.isNotEmpty()) {
                 Spacer(Modifier.height(AppLayout.sectionGap))
-                GlassCard(backdrop = backdrop, pageType = "default") {
+                StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "default") {
                     Column(Modifier.padding(14.dp)) {
                         HwGroupHeader(
                             title = AppStrings.get(group.nameKey),
@@ -528,6 +535,7 @@ fun HuaweiBoostScreen(
                         }
                     }
                 }
+    }
             }
         }
 

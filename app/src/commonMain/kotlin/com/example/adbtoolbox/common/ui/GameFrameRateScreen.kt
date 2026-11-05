@@ -211,7 +211,8 @@ fun GameFrameRateScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 本机屏幕 ----------------
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 if (loading || info == null) {
                     BasicText(
@@ -237,11 +238,13 @@ fun GameFrameRateScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 写入通道 ----------------
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(
                     AppStrings.get("gfr_path"),
@@ -286,11 +289,13 @@ fun GameFrameRateScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 全局帧率 ----------------
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(
                     AppStrings.get("gfr_global_title"),
@@ -379,11 +384,13 @@ fun GameFrameRateScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // ---------------- 按游戏设置 ----------------
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(
                     AppStrings.get("gfr_per_game_title"),
@@ -595,10 +602,12 @@ fun GameFrameRateScreen(
                 }
             }
         }
+    }
 
         // ---------------- 系统级按游戏限帧（仅在有提权时可用） ----------------
         Spacer(Modifier.height(AppLayout.sectionGap))
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(4) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(
                     AppStrings.get("gfr_advanced_title"),
@@ -662,11 +671,13 @@ fun GameFrameRateScreen(
                 }
             }
         }
+    }
 
         // ---------------- 执行结果（真实回读） ----------------
         resultText?.let { text ->
             Spacer(Modifier.height(AppLayout.sectionGap))
-            GlassCard(backdrop = backdrop, pageType = "home") {
+            StaggeredCard(5) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     BasicText(
                         AppStrings.get("gfr_result"),
@@ -712,6 +723,7 @@ fun GameFrameRateScreen(
                     }
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(AppLayout.sectionGap))

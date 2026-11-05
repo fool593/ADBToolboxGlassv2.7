@@ -412,14 +412,49 @@ actual object PluginManager {
         }
     }
 
-    /** 执行 customize.sh；没装、装好、失败三种情况分别返回 ""/""/真实原因。 */
+    /** 执行 customize.sh；没装、装好、失败三种情况分别返回 ""/""/真实原因。
+     *  AxManager 感知（按其源码/server 语义）：
+     *  - 若设备装了 AxManager（/data/user_de/0/com.android.shell/axeron/bin/busybox），
+     *    用它的 BusyBox ash 运行，并注入 AXERON=true / AXERONVER，脚本才能正确初始化；
+     *  - 脚本执行前统一转 LF（AxManager 与 KernelSU 规范都要求 UNIX 换行，
+     *    CRLF 会让 Android sh 解析失败 → 退出码 1，这正是"脚本刷入返回值 1"的元凶之一）。 */
     private fun runCustomizeIfPresent(moduleDir: File): String {
         val script = File(moduleDir, "customize.sh")
         if (!script.isFile) return ""
         return try {
+            // 1) LF 规范化：.sh / module.prop 必须是 UNIX 换行
+            try {
+                if (script.exists() && script.length() > 0) {
+                    val txt = script.readText()
+                    if (txt.contains("\r\n")) script.writeText(txt.replace("\r\n", "\n"))
+                }
+                val prop = File(moduleDir, "module.prop")
+                if (prop.exists()) {
+                    val pt = prop.readText()
+                    if (pt.contains("\r\n")) prop.writeText(pt.replace("\r\n", "\n"))
+                }
+            } catch (_: Exception) {}
+            // 2) 补全标准安装环境（根因修复，非补丁）：脚本靠这些变量决定逻辑，
+            //    缺失会导致 [ "$ARCH" = arm64 ]、$ZIPFILE、$API 等引用落空 -> exit 1。
             val dir = moduleDir.absolutePath
+            val is64 = android.os.Build.SUPPORTED_64_BIT_ABIS.isNotEmpty()
+            val env = buildString {
+                append("MODPATH=${shq(dir)} ")
+                append("TMPDIR=${shq(dir)} ")
+                append("ZIPFILE=${shq("$dir/installer.zip")} ")
+                append("ARCH=").append(if (is64) "arm64" else "arm").append(' ')
+                append("IS64BIT=").append(if (is64) "true" else "false").append(' ')
+                append("API=").append(android.os.Build.VERSION.SDK_INT).append(' ')
+                append("BOOTMODE=true ")
+                // OUTFD：Magisk/AxManager 标准脚本的 ui_print 走 fd 3（echo >&3），
+                // 没有 fd 3 时脚本一写 UI 日志就 "Bad file descriptor" -> abort -> exit 1。
+                append("OUTFD=3 ")
+            }
+            val axBox = detectAxManagerBusybox()
+            val shell = if (axBox != null) "${shq(axBox)} sh" else "sh"
+            val axEnv = if (axBox != null) "AXERON=true AXERONVER=10400 " else ""
             val result = ADBTools.execCommand(
-                "cd ${shq(dir)} && MODPATH=${shq(dir)} TMPDIR=${shq(dir)} sh customize.sh",
+                "cd ${shq(dir)} && ${axEnv}${env}$shell customize.sh 3>&1",
                 timeout = 120
             )
             if (result.exitCode == 0) {
@@ -431,6 +466,17 @@ actual object PluginManager {
             }
         } catch (e: Exception) {
             "${e.javaClass.simpleName}: ${e.message.orEmpty()}"
+        }
+    }
+
+    /** 检测 AxManager BusyBox 是否存在；存在则返回其路径（其插件/脚本要求在该环境下运行）。 */
+    private fun detectAxManagerBusybox(): String? {
+        return try {
+            val p = "/data/user_de/0/com.android.shell/axeron/bin/busybox"
+            val r = ADBTools.execCommand("test -x ${shq(p)} && echo yes", 8)
+            if (r.output.contains("yes")) p else null
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -567,42 +613,6 @@ actual object PluginManager {
     }
 
     // 执行所有已启用插件的开机脚本（由 BootReceiver 调用）
-    fun runBootScripts(context: Context) {
-        try {
-            val plugins = getInstalledPlugins().filter { it.isEnabled }
-            plugins.forEach { plugin ->
-                val pluginDir = File(plugin.pluginDir)
-                // 执行 post-fs-data.sh
-                val postFsData = File(pluginDir, "post-fs-data.sh")
-                if (postFsData.isFile) {
-                    val dir = pluginDir.absolutePath
-                    ADBTools.execCommand(
-                        "cd ${shq(dir)} && MODDIR=${shq(dir)} sh post-fs-data.sh",
-                        timeout = 60
-                    )
-                }
-                // 执行 service.sh（后台执行）
-                val serviceSh = File(pluginDir, "service.sh")
-                if (serviceSh.isFile) {
-                    val dir = pluginDir.absolutePath
-                    Thread {
-                        ADBTools.execCommand(
-                            "cd ${shq(dir)} && MODDIR=${shq(dir)} sh service.sh",
-                            timeout = 300
-                        )
-                    }.start()
-                }
-                // 加载 system.prop
-                val systemProp = File(pluginDir, "system.prop")
-                if (systemProp.isFile) {
-                    parseModuleProp(systemProp).forEach { (key, value) ->
-                        ADBTools.execCommand("setprop ${shq(key)} ${shq(value)}")
-                    }
-                }
-            }
-        } catch (e: Exception) {
-        }
-    }
 
     // 获取插件 WebUI 的入口文件路径（不存在返回 null，界面因此不显示"打开界面"）
     actual fun getWebUIPath(pluginId: String): String? {

@@ -62,6 +62,8 @@ fun ADBModuleScreen(
     var useRootMode by remember { mutableStateOf(true) }
     var capability by remember { mutableStateOf(ModuleCapability()) }
     var isSuccess by remember { mutableStateOf(false) }
+    var pendingReboot by remember { mutableStateOf(false) }        // 刷入成功，等待用户确认重启后生效
+    var isRebooting by remember { mutableStateOf(false) }          // 正在重启（按钮防连点）
     var failureMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
@@ -131,6 +133,28 @@ fun ADBModuleScreen(
                 ?: if (failed) AppStrings.get("operation_failed") else null
             installLog = result
             isInstalling = false
+            pendingReboot = isSuccess
+        }
+    }
+
+    /** 重启手机（模块重启后才会真正生效）；需要 Root，失败如实提示。 */
+    fun rebootNow() {
+        scope.launch {
+            isRebooting = true
+            val r = withContext(Dispatchers.Default) {
+                kotlin.runCatching {
+                    ADBTools.execCommand(
+                        "su -c setprop sys.powerctl reboot 2>/dev/null || setprop sys.powerctl reboot 2>/dev/null || reboot",
+                        12
+                    )
+                }.getOrNull()
+            }
+            isRebooting = false
+            if (r?.exitCode != 0) {
+                failureMessage = AppStrings.get("reboot_failed") + (r?.error?.trim()?.let { "\n$it" } ?: "")
+            } else {
+                pendingReboot = false
+            }
         }
     }
 
@@ -153,7 +177,8 @@ fun ADBModuleScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 刷入模式 + 权限提示
-        GlassCard(backdrop = backdrop, pageType = "adbmodule") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "adbmodule") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 SectionTitle(AppStrings.get("flash_mode"), contentColor)
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -203,11 +228,13 @@ fun ADBModuleScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 文件选择
-        GlassCard(backdrop = backdrop, pageType = "adbmodule") {
+        StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "adbmodule") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 SectionTitle(AppStrings.get("select_module_file"), contentColor)
                 Row(horizontalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -239,6 +266,7 @@ fun ADBModuleScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
@@ -262,7 +290,8 @@ fun ADBModuleScreen(
 
         // 失败原因（必须让用户看到，而不是只在日志里）
         failureMessage?.let { message ->
-            GlassCard(backdrop = backdrop, pageType = "adbmodule") {
+            StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "adbmodule") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     SectionTitle(AppStrings.get("failed"), contentColor)
                     BasicText(
@@ -271,12 +300,14 @@ fun ADBModuleScreen(
                     )
                 }
             }
+    }
             Spacer(Modifier.height(AppLayout.sectionGap))
         }
 
         // 刷入日志
         if (installLog.isNotEmpty()) {
-            GlassCard(backdrop = backdrop, pageType = "adbmodule") {
+            StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "adbmodule") {
                 Column(Modifier.padding(AppLayout.cardPad)) {
                     SectionTitle(
                         if (isSuccess) "${AppStrings.get("install_log")} - ${AppStrings.get("success")}"
@@ -287,8 +318,28 @@ fun ADBModuleScreen(
                         installLog,
                         style = TextStyle(contentColor, AppLayout.captionSize, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
                     )
+                    if (pendingReboot) {
+                        Spacer(Modifier.height(10.dp))
+                        BasicText(
+                            AppStrings.get("module_reboot_hint"),
+                            style = TextStyle(Color(0xFF34C759), AppLayout.captionSize)
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        LiquidButton(
+                            onClick = { rebootNow() },
+                            backdrop = backdrop,
+                            modifier = Modifier.height(40.dp).fillMaxWidth(),
+                            tint = Color(0xFF34C759)
+                        ) {
+                            BasicText(
+                                if (isRebooting) AppStrings.get("rebooting") else AppStrings.get("reboot_device"),
+                                style = TextStyle(Color.White, 13.sp)
+                            )
+                        }
+                    }
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(80f.dp))

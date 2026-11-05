@@ -46,5 +46,9 @@ enum class ADBDestination {
      */
     /** v2.9 游龙式安全护盾：root 全盘恶意脚本扫描（只列出提示，删除需逐条确认） */
     ShieldScan,
-    KernelRoot
+    KernelRoot,
+    /** v3.2 多线程下载器：直链分块高速下载，完成后自动保存到手机内部存储 Download 文件夹 */
+    Downloader,
+    /** v3.2 ColorOS 17 开启动画独立 UI（第 5 套独立 UI，全屏引导预览） */
+    ColorOS17
 }

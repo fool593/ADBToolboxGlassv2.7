@@ -95,8 +95,22 @@ object KernelRoot {
         // 用 sh -c 进入目录再执行：部分 exploit 依赖当前工作目录写临时文件
         val escapedDir = "'" + dir.replace("'", "'\\''") + "'"
         val escapedFile = "'" + "./" + file.replace("'", "'\\''") + "'"
+        // 官方实现对照（ghostlock main.cpp CLI）：裸运行只打印 usage，
+        // 必须给入口参数才能走攻击链路 —— --ghostlock-app-call（app 入口）或
+        // --load-prebuilt-profile <bin>（预置 profile.bin）。同目录有 *.bin 时优先后者。
+        val ghostArgs: String = if (file.contains("ghostlock", ignoreCase = true)) {
+            try {
+                val bin = java.io.File(dir).listFiles()
+                    ?.firstOrNull { it.name.endsWith(".bin") }
+                if (bin != null) "--load-prebuilt-profile '" + bin.name.replace("'", "'\\''") + "'" else "--ghostlock-app-call"
+            } catch (e: Exception) {
+                "--ghostlock-app-call"
+            }
+        } else {
+            ""
+        }
         val run = try {
-            ADBTools.execCommand("cd $escapedDir && $escapedFile 2>&1; echo EXIT=\$?", timeoutSec)
+            ADBTools.execCommand("cd $escapedDir && $escapedFile $ghostArgs 2>&1; echo EXIT=\$?", timeoutSec)
         } catch (e: Exception) {
             CommandResult("", "${e.javaClass.simpleName}: ${e.message}", -1)
         }
@@ -104,7 +118,7 @@ object KernelRoot {
         return@withContext CommandResult(
             output = buildString {
                 append(run.output.trim())
-                append("\n--- root 探测 ---\n")
+                append("\n" + com.example.adbtoolbox.common.AppStrings.get("kroot_probe_label") + "\n")
                 append(probe)
             },
             error = run.error,
@@ -127,4 +141,31 @@ object KernelRoot {
         }
         if (plain.isBlank()) viaSu else "$plain\n(su: ${viaSu.ifBlank { "不可用" }})"
     }
+    /** 官方 CLI 全集执行：跑 ghostlock 二进制并显式追加 flags（见 main.cpp），
+     *  裸运行只会打印 usage；同 runExploit 一样最后做 uid=0 探测。 */
+    suspend fun runGhostlockCli(remotePath: String, flags: String, timeoutSec: Int = 120): CommandResult =
+        withContext(Dispatchers.Default) {
+            if (remotePath.isBlank() || !remotePath.startsWith("/data/local/tmp/")) {
+                return@withContext CommandResult("", "refused: remote path must be under /data/local/tmp", 1)
+            }
+            val dir = remotePath.substringBeforeLast('/')
+            val file = "./" + remotePath.substringAfterLast('/')
+            val ed = "'" + dir.replace("'", "'\\''") + "'"
+            val ef = "'" + file.replace("'", "'\\''") + "'"
+            val run = try {
+                ADBTools.execCommand("cd $ed && $ef $flags 2>&1; echo EXIT=\$?", timeoutSec)
+            } catch (e: Exception) {
+                CommandResult("", "${e.javaClass.simpleName}: ${e.message}", -1)
+            }
+            val probe = probeRoot()
+            CommandResult(
+                output = buildString {
+                    append(run.output.trim())
+                    append("\n" + com.example.adbtoolbox.common.AppStrings.get("kroot_probe_label") + "\n")
+                    append(probe)
+                },
+                error = run.error,
+                exitCode = if (probe.contains("uid=0")) 0 else run.exitCode
+            )
+        }
 }

@@ -238,11 +238,13 @@ fun PluginsScreen(
             Spacer(Modifier.height(12f.dp))
 
             if (isInstalling) {
-                GlassCard(backdrop = backdrop, pageType = "plugins") {
+                StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                     Box(Modifier.padding(16f.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
                         BasicText(AppStrings.get("installing"), style = TextStyle(contentColor, 14f.sp))
                     }
                 }
+    }
                 Spacer(Modifier.height(8f.dp))
             }
 
@@ -252,7 +254,8 @@ fun PluginsScreen(
                     // 这里翻成当前语言；首行是成功码才用绿色，其余一律按失败展示。
                     val resultText = localizePluginInstallMessage(rawResult)
                     val failed = isPluginInstallFailure(rawResult)
-                    GlassCard(backdrop = backdrop, pageType = "plugins") {
+                    StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                         Column(Modifier.padding(16f.dp).fillMaxWidth()) {
                             BasicText(
                                 resultText,
@@ -276,12 +279,14 @@ fun PluginsScreen(
                             }
                         }
                     }
+    }
                     Spacer(Modifier.height(8f.dp))
                 }
             }
 
             errorMessage?.let { message ->
-                GlassCard(backdrop = backdrop, pageType = "plugins") {
+                StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                     Box(Modifier.padding(16f.dp).fillMaxWidth()) {
                         BasicText(
                             message,
@@ -289,6 +294,7 @@ fun PluginsScreen(
                         )
                     }
                 }
+    }
                 Spacer(Modifier.height(8f.dp))
             }
 

@@ -139,6 +139,9 @@ actual object GlassEffectPersistence {
         editor.putBoolean("app_onboarding_done", AppSettings.onboardingDone)
         // 开屏动画开关
         editor.putBoolean("app_splash_anim", AppSettings.splashAnimEnabled)
+        editor.putBoolean("ui_native_style", AppSettings.nativeUi)
+        // v3.2 UI 风格三态（glass / tech / coloros17）
+        editor.putString("ui_style", AppSettings.uiStyle)
 
         editor.apply()
     }
@@ -161,6 +164,11 @@ actual object GlassEffectPersistence {
         AppSettings.themeUserOverrode = prefs.getBoolean("app_theme_user_overrode", false)
         AppSettings.onboardingDone = prefs.getBoolean("app_onboarding_done", false)
         AppSettings.splashAnimEnabled = prefs.getBoolean("app_splash_anim", true)
+        AppSettings.nativeUi = prefs.getBoolean("ui_native_style", false)
+        // v3.2 UI 风格三态：优先读新键，旧存档回退到 ui_native_style
+        AppSettings.uiStyle = prefs.getString("ui_style", if (prefs.getBoolean("ui_native_style", false)) "tech" else "glass")
+            ?: if (prefs.getBoolean("ui_native_style", false)) "tech" else "glass"
+        try { com.example.adbtoolbox.common.GlassEffectConfig.applyUiStyle() } catch (_: Exception) {}
         if (savedTheme != null) AppSettings.themeId = savedTheme
 
         val config = GlassEffectConfig

@@ -76,7 +76,8 @@ fun RootToolScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 设备信息卡片
-        GlassCard(backdrop = backdrop, pageType = "plugins") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
             Column(Modifier.padding(AppLayout.cardPadCompact)) {
                 BasicText(AppStrings.get("device_info"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, FontWeight.Bold))
                 Spacer(Modifier.height(AppLayout.innerGap))
@@ -115,11 +116,13 @@ fun RootToolScreen(
                 }
             }
         }
+    }
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 自动检测到的Available Root Methods（基于网上公开漏洞与教程）
         if (availableMethods.isNotEmpty()) {
-            GlassCard(backdrop = backdrop, pageType = "plugins") {
+            StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                 Column(Modifier.padding(AppLayout.cardPadCompact)) {
                     BasicText(if (AppSettings.language == "en") "Available Root Methods (${availableMethods.size})" else "可用 Root 方法 (${availableMethods.size})", style = TextStyle(contentColor, AppLayout.sectionTitleSize, FontWeight.Bold))
                     Spacer(Modifier.height(4.dp))
@@ -354,12 +357,14 @@ fun RootToolScreen(
                     }
                 }
             }
+    }
             Spacer(Modifier.height(AppLayout.sectionGap))
         }
 
         // Root 方案选择
         if (deviceInfo != null && deviceInfo!!.supportedMethods.isNotEmpty()) {
-            GlassCard(backdrop = backdrop, pageType = "plugins") {
+            StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                 Column(Modifier.padding(AppLayout.cardPadCompact)) {
                     BasicText(AppStrings.get("select_root_method"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, FontWeight.Bold))
                     Spacer(Modifier.height(AppLayout.innerGap))
@@ -425,12 +430,14 @@ fun RootToolScreen(
                     }
                 }
             }
+    }
             Spacer(Modifier.height(AppLayout.sectionGap))
         }
 
         // 进度显示
         if (currentStep != RootStep.IDLE && currentStep != RootStep.DONE && currentStep != RootStep.ERROR) {
-            GlassCard(backdrop = backdrop, pageType = "plugins") {
+            StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                 Column(Modifier.padding(AppLayout.cardPadCompact)) {
                     BasicText(AppStrings.get("exec_progress"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, FontWeight.Bold))
                     Spacer(Modifier.height(AppLayout.innerGap))
@@ -451,12 +458,14 @@ fun RootToolScreen(
                     }
                 }
             }
+    }
             Spacer(Modifier.height(AppLayout.sectionGap))
         }
 
         // 结果显示
         result?.let { r ->
-            GlassCard(backdrop = backdrop, pageType = "plugins") {
+            StaggeredCard(4) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                 Column(Modifier.padding(AppLayout.cardPadCompact)) {
                     BasicText(
                         if (r.success) AppStrings.get("op_success") else AppStrings.get("op_failed"),
@@ -466,6 +475,7 @@ fun RootToolScreen(
                     BasicText(r.message, style = TextStyle(contentColor.copy(alpha = 0.8f), 13.sp))
                 }
             }
+    }
             Spacer(Modifier.height(AppLayout.sectionGap))
         }
 
@@ -579,7 +589,8 @@ fun RootToolScreen(
                 BasicText(AppStrings.get("redetect"), style = TextStyle(Color.White, AppLayout.bodySize))
             }
         } else if (!isLoading) {
-            GlassCard(backdrop = backdrop, pageType = "plugins") {
+            StaggeredCard(5) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
                 Column(Modifier.padding(AppLayout.cardPadCompact)) {
                     BasicText(AppStrings.get("not_supported"), style = TextStyle(Color(0xFFFF9500), AppLayout.sectionTitleSize, FontWeight.Bold))
                     Spacer(Modifier.height(8.dp))
@@ -589,12 +600,14 @@ fun RootToolScreen(
                     )
                 }
             }
+    }
         }
 
         Spacer(Modifier.height(20.dp))
 
         // 风险提示
-        GlassCard(backdrop = backdrop, pageType = "plugins") {
+        StaggeredCard(6) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
             Column(Modifier.padding(AppLayout.cardPadCompact)) {
                 BasicText(AppStrings.get("risk_warning"), style = TextStyle(Color(0xFFFF3B30), AppLayout.sectionTitleSize, FontWeight.Bold))
                 Spacer(Modifier.height(8.dp))
@@ -604,6 +617,7 @@ fun RootToolScreen(
                 )
             }
         }
+    }
         Spacer(Modifier.height(40.dp))
     }
 }

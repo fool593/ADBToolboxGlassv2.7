@@ -1,5 +1,6 @@
 package com.example.adbtoolbox.common.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.example.adbtoolbox.common.ADBTools
 import com.example.adbtoolbox.common.AppCache
@@ -86,7 +88,8 @@ fun SettingsScreen(
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 壁纸设置
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(AppStrings.get("wallpaper"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 Spacer(Modifier.height(AppLayout.innerGap))
@@ -109,11 +112,13 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 动态壁纸设置
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad), verticalArrangement = Arrangement.spacedBy(AppLayout.innerGap)) {
                 BasicText(AppStrings.get("dynamic_wallpaper"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
 
@@ -177,11 +182,13 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 开屏动画设置
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad), verticalArrangement = Arrangement.spacedBy(AppLayout.innerGap)) {
                 BasicText(AppStrings.get("splash_animation"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 BasicText(AppStrings.get("splash_video_hint"), style = TextStyle(contentColor.copy(alpha = 0.6f), 12f.sp))
@@ -215,11 +222,13 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(AppStrings.get("glass_effect"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 Spacer(Modifier.height(AppLayout.innerGap))
@@ -233,11 +242,13 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 主题（配色方案）
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(4) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(AppStrings.get("theme"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 Spacer(Modifier.height(4f.dp))
@@ -296,11 +307,13 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 主题设置
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(5) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(AppStrings.get("display_settings"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 Spacer(Modifier.height(16f.dp))
@@ -336,13 +349,42 @@ fun SettingsScreen(
                         }
                     }
                 }
+
+                Spacer(Modifier.height(16f.dp))
+
+                // 界面风格（三套独立 UI：液态玻璃 / 科技风 / ColorOS 17 开机引导）
+                BasicText(AppStrings.get("ui_style"), style = TextStyle(contentColor, AppLayout.bodySize))
+                Spacer(Modifier.height(8f.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8f.dp)) {
+                    listOf(
+                        "glass" to AppStrings.get("ui_style_glass"),
+                        "tech" to AppStrings.get("ui_style_native"),
+                        "coloros17" to AppStrings.get("ui_style_coloros17")
+                    ).forEach { (style, name) ->
+                        val sel = AppSettings.uiStyle == style
+                        LiquidButton(
+                            onClick = {
+                                AppSettings.uiStyle = style
+                                com.example.adbtoolbox.common.GlassEffectConfig.applyUiStyle()
+                                try { GlassEffectPersistence.saveAll() } catch (_: Exception) {}
+                            },
+                            backdrop = backdrop,
+                            modifier = Modifier.height(36f.dp),
+                            tint = if (sel) Color(0xFFAF52DE) else Color.Unspecified
+                        ) {
+                            BasicText(name, Modifier.padding(horizontal = 12f.dp), style = TextStyle(if (sel) Color.White else contentColor, 12f.sp))
+                        }
+                    }
+                }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // Shizuku 状态
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(6) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(AppStrings.get("shizuku_service"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 Spacer(Modifier.height(8f.dp))
@@ -377,11 +419,13 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // Dhizuku 设备所有者
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(7) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText("Dhizuku (Device Owner)", style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 Spacer(Modifier.height(8f.dp))
@@ -446,11 +490,13 @@ fun SettingsScreen(
                 BasicText(AppStrings.get("dhizuku_notice"), style = TextStyle(contentColor.copy(alpha = 0.5f), AppLayout.captionSize))
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 显示设置
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(8) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText("${AppStrings.get("screen_brightness")}: ${brightness.toInt()}", style = TextStyle(contentColor, AppLayout.bodySize))
                 Spacer(Modifier.height(8f.dp))
@@ -493,6 +539,29 @@ fun SettingsScreen(
                         BasicText(AppStrings.get("settings_splash_anim"), style = TextStyle(contentColor, AppLayout.bodySize, FontWeight.Medium))
                         BasicText(AppStrings.get("settings_splash_anim_desc"), style = TextStyle(contentColor.copy(alpha = 0.55f), AppLayout.captionSize))
                     }
+                Spacer(Modifier.height(14.dp))
+                val crash = com.example.adbtoolbox.common.AppCache.crashLog.value
+                if (crash != null) {
+                    BasicText(AppStrings.get("settings_crashlog"), style = TextStyle(contentColor, AppLayout.bodySize, FontWeight.Medium))
+                    Spacer(Modifier.height(4.dp))
+                    Box(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(contentColor.copy(alpha = 0.06f)).padding(10.dp)
+                    ) {
+                        BasicText(
+                            crash.take(900),
+                            style = TextStyle(
+                                color = Color(0xFFE8A33D),
+                                fontSize = 10.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    BasicText(
+                        AppStrings.get("settings_crashlog_hint"),
+                        style = TextStyle(contentColor.copy(alpha = 0.5f), AppLayout.captionSize)
+                    )
+                }
                     LiquidToggle(
                         selected = { com.example.adbtoolbox.common.AppSettings.splashAnimEnabled },
                         onSelect = {
@@ -530,11 +599,13 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(AppLayout.sectionGap))
 
         // 系统操作
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(9) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(AppLayout.cardPad)) {
                 BasicText(AppStrings.get("system_actions"), style = TextStyle(contentColor, AppLayout.sectionTitleSize, androidx.compose.ui.text.font.FontWeight.Medium))
                 Spacer(Modifier.height(AppLayout.innerGap))
@@ -566,6 +637,7 @@ fun SettingsScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(80f.dp))
     }

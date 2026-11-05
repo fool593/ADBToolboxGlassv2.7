@@ -118,7 +118,8 @@ fun GlassPlaygroundScreen(
         Spacer(Modifier.height(24f.dp))
 
         // 调节滑块区域
-        GlassCard(backdrop = backdrop) {
+        StaggeredCard(0) {
+    GlassCard(backdrop = backdrop) {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(20f.dp)) {
                 // 圆角
                 Column(verticalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -421,11 +422,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // 字体颜色选择（全局文字颜色，赤橙黄绿青蓝紫 + 默认/白/黑）
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(1) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("font_color"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
                 Row(
@@ -465,11 +468,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // 导航栏胶囊调节
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(2) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("nav_capsule_settings"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
 
@@ -544,11 +549,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // 导航栏液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(3) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("nav_glass"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
 
@@ -616,11 +623,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // 主页液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "home") {
+        StaggeredCard(4) {
+    GlassCard(backdrop = backdrop, pageType = "home") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("home_glass"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
                 // 模糊
@@ -655,11 +664,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // 终端液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "terminal") {
+        StaggeredCard(5) {
+    GlassCard(backdrop = backdrop, pageType = "terminal") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("terminal_glass"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
                 Column(verticalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -689,11 +700,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // 设置页面液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "settings") {
+        StaggeredCard(6) {
+    GlassCard(backdrop = backdrop, pageType = "settings") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("settings_glass"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
                 Column(verticalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -723,11 +736,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // 应用管理液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "apps") {
+        StaggeredCard(7) {
+    GlassCard(backdrop = backdrop, pageType = "apps") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("apps_glass"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
                 Column(verticalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -757,11 +772,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // plugins_glass液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "plugins") {
+        StaggeredCard(8) {
+    GlassCard(backdrop = backdrop, pageType = "plugins") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("plugins_glass"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
                 Column(verticalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -791,11 +808,13 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
         // adbmodule_glass液态玻璃调节
-        GlassCard(backdrop = backdrop, pageType = "adbmodule") {
+        StaggeredCard(9) {
+    GlassCard(backdrop = backdrop, pageType = "adbmodule") {
             Column(Modifier.padding(20f.dp), verticalArrangement = Arrangement.spacedBy(12f.dp)) {
                 BasicText(AppStrings.get("adbmodule_glass"), style = TextStyle(contentColor, 18f.sp, androidx.compose.ui.text.font.FontWeight.Medium))
                 Column(verticalArrangement = Arrangement.spacedBy(8f.dp)) {
@@ -825,6 +844,7 @@ fun GlassPlaygroundScreen(
                 }
             }
         }
+    }
 
         Spacer(Modifier.height(16f.dp))
 
